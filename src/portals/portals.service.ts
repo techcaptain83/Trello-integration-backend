@@ -11,9 +11,9 @@ export class PortalsService {
 
   async addTimeLogForTasks(req) {
     const { cardId } = req.params;
-    const { duration, billable, description } = req.body;
-    const url = `https://api.trello.com/1/cards/${cardId}/actions/comments`;
-    
+    const { duration, status, description } = req.body;
+    const time_url = `https://api.trello.com/1/cards/${cardId}/actions/comments`;
+    const status_url = `https://api.trello.com/1/cards/${cardId}/idList`;
     const api_key = this.configService.get('TRELLO_API_KEY');
 
     const headers = {
@@ -27,13 +27,29 @@ export class PortalsService {
       token: token,
       text: text,
     };
+    
+    const param = {
+      key: api_key,
+      token: token,
+      value: status
+    }
 
-    const response = await this.httpService.axiosRef.post(url, null, {
-      headers: headers,
-      params: params
-    });
-    const json = response.data;
-    return json;
+    try{
+
+      const response = await this.httpService.axiosRef.post(time_url, null, {
+        headers: headers,
+        params: params
+      });
+      const json = response.data;
+
+      const resp = await this.httpService.axiosRef.put(status_url, null, {
+        params: param
+      });
+      const result = resp.data;
+      return {json, result};
+    } catch(error) {
+      return error;
+    }
   }
 
   async getAllWorkspaces(req: any) {
@@ -74,19 +90,39 @@ export class PortalsService {
   }
 
   async getAllTasksOfLists(req: any) {
-    const url = `https://api.trello.com/1/boards/${req.params.listID}/cards`
     const api_key = this.configService.get('TRELLO_API_KEY');
+    if (!req.query.ids) {
+      return;
+    }
+    const data : any = [];
+    for (let item of req.query.ids) {
+        const url = `https://api.trello.com/1/lists/${item.id}/cards?key=${api_key}&token=${req.query.access_token}`
+        const response = await fetch(url);
+        const json = await response.json();
+        const temp = {
+          list_id: item.id,
+          list_name: item.name,
+          card: json
+        }
+        data.push(temp);
+    }
+    return data;
+  }
 
+  async getAllListsOfBoard(req: any) {
+    const {boardID} = req.params;
+    const url =`https://api.trello.com/1/boards/${boardID}/lists`;
+    const api_key = this.configService.get('TRELLO_API_KEY');
     const params = {
       key: api_key,
       token: req.query.access_token
     };
-    
+
     const response = await this.httpService.axiosRef.get(url, {
       params
     });
-
     const json = response.data;
+    console.log(json);
     return json;
   }
 }

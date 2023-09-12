@@ -22,7 +22,7 @@ export class PortalsController {
     return boards;
   }
 
-  @Get(':listID/tasks')
+  @Get('tasks')
   async getAllTasksOfLists(@Req() req) {
     try {
       const tasks: any = await this.portalsService.getAllTasksOfLists(req);
@@ -34,10 +34,26 @@ export class PortalsController {
     }
   }
 
+  @Get(':boardID/lists')
+  async getAllListsOfBoard(@Req() req) {
+    try {
+      const lists: any = await this.portalsService.getAllListsOfBoard(req);
+      return lists;
+    } catch(error) {
+      console.log('board error', error);
+      return error;
+    }
+  }
+
   @Post(':cardId/log')
   async addTimeLogForTasks(@Req() req) {
-    const log: any = await this.portalsService.addTimeLogForTasks(req);
-    return log;
+    try {
+      const log: any = await this.portalsService.addTimeLogForTasks(req);
+      return log;
+    } catch (error) {
+      console.log('error', error);
+      return error;
+    }
   }
 
 }
