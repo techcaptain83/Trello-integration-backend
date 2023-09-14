@@ -10,7 +10,7 @@ export class AuthsService {
     private readonly configService: ConfigService,
   ) {}
 
-  getJiraLoginUrl() {
+  getLoginUrl() {
     
     const state = Math.random().toString();
     
@@ -48,7 +48,7 @@ export class AuthsService {
 
   async getProfile(access_token: string) {
     const url = 'https://api.trello.com/1/members/me/';
-    console.log("get profile: ", access_token);
+
     const api_key = this.configService.get('TRELLO_API_KEY');
     const params = {
       key: api_key,

@@ -7,12 +7,12 @@ export class AuthController {
   constructor(private readonly authService: AuthsService) {}
 
   @Get('/trello') 
-  jiraLogin(@Res() res) {
-    res.redirect(this.authService.getJiraLoginUrl());
+  login(@Res() res) {
+    res.redirect(this.authService.getLoginUrl());
   }
 
   @Get('/callback') 
-  async jiraCallback(@Req() req) {
+  async callback(@Req() req) {
     try {
       // const data = await this.authService.authorize(req.query.code);
       // return data;
